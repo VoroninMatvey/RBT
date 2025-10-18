@@ -17,7 +17,7 @@ template <typename KeyT> struct Node {
 
   explicit Node(const KeyT &key) : key_{key} {}
 
-  pointer minimum(pointer val) const {
+  pointer minimum(pointer val) const noexcept {
     if (!val)
       return val;
 
@@ -27,7 +27,7 @@ template <typename KeyT> struct Node {
     return val;
   }
 
-  pointer maximum(pointer val) const {
+  pointer maximum(pointer val) const noexcept {
     if (!val)
       return val;
 
@@ -39,7 +39,8 @@ template <typename KeyT> struct Node {
 
   // next node in tree traversal
   // return end_node, if this->key == max
-  pointer successor() const {
+  pointer successor() const noexcept {
+    if(!parent_) return this; //if *this == end_node
     pointer ptr1 = this;
     if (ptr1->right_) {
       return minimum(ptr1->right_.get());
@@ -55,14 +56,15 @@ template <typename KeyT> struct Node {
 
   // previous node in tree traversal
   // return end_node, if this->key == min
-  pointer predecessor() const {
+  pointer predecessor() const noexcept {
     pointer ptr1 = this;
     if (ptr1->left_) {
       return maximum(ptr1->left_.get());
     }
 
+    if(!parent_) return this; //if tree is empty and *this == end_node
     pointer ptr2 = ptr1->parent_;
-    while (ptr2->parent_ && ptr2->left_ && ptr2->left_.get() == ptr1) { //
+    while (ptr2->parent_ && ptr2->left_ && ptr2->left_.get() == ptr1) { 
       ptr1 = ptr2;
       ptr2 = ptr2->parent_;
     }
