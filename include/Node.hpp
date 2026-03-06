@@ -12,7 +12,7 @@ template <typename KeyT> struct Node {
   const KeyT key_;
   pointer parent_ = nullptr;
   unique_ptr left_ = nullptr, right_ = nullptr;
-  int offspring_sum_ = 0;
+  std::size_t weight = 0;
   Color color_ = Color::RED;
 
   explicit Node(const KeyT &key) : key_{key} {}
@@ -47,7 +47,7 @@ template <typename KeyT> struct Node {
     }
 
     pointer ptr2 = ptr1->parent_;
-    while (ptr2->right_ && ptr2->right_.get() == ptr1) {
+    while (ptr2->right_.get() == ptr1) {
       ptr1 = ptr2;
       ptr2 = ptr2->parent_;
     }
@@ -62,9 +62,9 @@ template <typename KeyT> struct Node {
       return maximum(ptr1->left_.get());
     }
 
-    if(!parent_) return this; //if tree is empty and *this == end_node
+    if(!parent_) return this; //if tree is empty 
     pointer ptr2 = ptr1->parent_;
-    while (ptr2->parent_ && ptr2->left_ && ptr2->left_.get() == ptr1) { 
+    while (ptr2->parent_ && ptr2->left_.get() == ptr1) { 
       ptr1 = ptr2;
       ptr2 = ptr2->parent_;
     }
