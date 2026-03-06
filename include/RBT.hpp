@@ -4,7 +4,7 @@
 
 namespace details {
 
-template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_Tree {
+template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_Tree final {
 
   public:
     using key_type = KeyT;
@@ -28,7 +28,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
   private:
     pointer create_root_node(const key_type& key) {
         auto root_ptr = std::make_unique<node_type>(key);
-        root_ptr->weight = 1;
+        root_ptr->weight_ = 1;
         begin_ptr_ = root_ptr.get();
         root_ptr->parent_ = sentinel_ptr_;
         sentinel_->left_ = std::move(root_ptr);
@@ -68,13 +68,66 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
             ins->parent_ = par;
         }
 
-        ins->weight = 1;
+        ins->weight_ = 1;
         while (par != sentinel_ptr_) {
-            ++par->weight;
+            ++par->weight_;
             par = par->parent_;
         }
 
         return ins;
+    }
+
+    void left_rotate(pointer x_ptr) noexcept {
+        pointer y_ptr = x_ptr->right_.get();
+        if (!y_ptr)
+            return;
+
+        auto temp = std::move(x_ptr->right_);
+        x_ptr->right_ = std::move(y_ptr->left_);
+        if (x_ptr->right_)
+            x_ptr->right_->parent_ = x_ptr;
+
+        y_ptr->parent_ = x_ptr->parent_;
+        if (x_ptr->parent_->left_.get() == x_ptr) {
+            y_ptr->left_ = std::move(x_ptr->parent_->left_);
+            y_ptr->parent_->left_ = std::move(temp);
+        } else {
+            y_ptr->left_ = std::move(x_ptr->parent_->right_);
+            y_ptr->parent_->right_ = std::move(temp);
+        }
+        x_ptr->parent_ = y_ptr;
+
+        rotate_weight_update(y_ptr, x_ptr);
+    }
+
+    void right_rotate(pointer y_ptr) noexcept {
+        pointer x_ptr = y_ptr->left_.get();
+        if (!x_ptr)
+            return;
+
+        auto temp = std::move(y_ptr->left_);
+        y_ptr->left_ = std::move(x_ptr->right_);
+        if (y_ptr->left_)
+            y_ptr->left_->parent_ = y_ptr;
+
+        x_ptr->parent_ = y_ptr->parent_;
+        if (y_ptr->parent_->left_.get() == y_ptr) {
+            x_ptr->right_ = std::move(y_ptr->parent_->left_);
+            x_ptr->parent_->left_ = std::move(temp);
+        } else {
+            x_ptr->right_ = std::move(y_ptr->parent_->right_);
+            x_ptr->parent_->right_ = std::move(temp);
+        }
+        y_ptr->parent_ = x_ptr;
+
+        rotate_weight_update(x_ptr, y_ptr);
+    }
+
+    void rotate_weight_update(pointer node_up, pointer node_down) noexcept {
+        node_up->weight_ = node_down->weight_;
+
+        node_down->weight_ = (node_down->left_ ? node_down->left_->weight_ : 0) +
+                             (node_down->right_ ? node_down->right_->weight_ : 0) + 1;
     }
 
     pointer find(const key_type& key) const {
