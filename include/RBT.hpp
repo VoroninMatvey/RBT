@@ -4,7 +4,10 @@
 
 namespace details {
 
+template <typename KeyT> class Tree_builder;
+
 template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_Tree final {
+    friend class Tree_builder;
 
   public:
     using key_type = KeyT;
