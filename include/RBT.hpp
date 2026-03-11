@@ -1,3 +1,4 @@
+#pragma once
 #include "Node.hpp"
 #include <functional>
 #include <memory>
@@ -7,7 +8,7 @@ namespace details {
 template <typename KeyT> class Tree_builder;
 
 template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_Tree final {
-    friend class Tree_builder;
+    friend class Tree_builder<KeyT>;
 
   public:
     using key_type = KeyT;
@@ -38,6 +39,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return sentinel_->left_.get();
     }
 
+  public:
     pointer Tree_Insert(const key_type& key) {
         pointer par = nullptr;
         pointer ins = sentinel_ptr_->left_.get();

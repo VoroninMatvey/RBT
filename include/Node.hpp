@@ -1,4 +1,5 @@
 #include <memory>
+#pragma once
 
 namespace details {
 
