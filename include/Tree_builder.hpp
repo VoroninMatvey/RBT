@@ -21,35 +21,38 @@ template <typename KeyT> class Tree_builder final {
     using const_pointer = const node_type*;
 
   private:
-    const_pointer root_;
+    const Red_Black_Tree<KeyT>& RBT_;
     const std::string RBT_dir_;
 
   public:
     Tree_builder(const Red_Black_Tree<key_type>& RBT, const std::string& tree_dir)
-        : root_{RBT.sentinel_->left_.get()}, RBT_dir_{tree_dir} {}
+        : RBT_{RBT}, RBT_dir_{tree_dir} {}
 
     void create_directory() const {
         fs::path dir = fs::path(RBT_dir_) / "data";
         fs::create_directories(dir);
     }
 
-    void dump_tree(const std::string& node_shape = "none", const std::string& fontname = "Arial",
-                   const std::string& edge_color = "#555555", const double penwidth = 1.5) const {
+    void dump_tree(std::size_t num, const std::string& node_shape = "none",
+                   const std::string& fontname = "Arial", const std::string& edge_color = "#555555",
+                   const double penwidth = 1.5) const {
 
         create_directory();
-        std::ofstream file = fs::path(RBT_dir_) / "data/Tree_builder.dot";
+        std::ofstream file =
+            fs::path(RBT_dir_) / ("data/Tree_builder" + std::to_string(num) + ".dot");
 
         file << "digraph RBT {\n\n\tnode [shape=" << node_shape << ", fontname=\"" << fontname
              << "\"];\n\tedge [color=\"" << edge_color << "\", penwidth=" << penwidth << "];\n\n";
 
-        if (!root_) {
+        const_pointer root = RBT_.sentinel_->left_.get();
+        if (!root) {
             file << "\t\"ROOT_NIL\" [shape = box, width = 1.0, height = 0.5, style = filled, "
                  << "fillcolor = black, fontcolor = white, label = \"EMPTY TREE\\n(NIL)\", "
                     "fontsize = 14];\n\n}";
             return;
         }
 
-        recursive_traversal_dump(file, root_, root_->key_, NodeSide::left);
+        recursive_traversal_dump(file, root, root->key_, NodeSide::left);
         file << "}";
     }
 
@@ -100,6 +103,7 @@ template <typename KeyT> class Tree_builder final {
                 "fontcolor = white, label = \"NIL\", fontsize = 8];\n\n";
     }
 
+    // operator << must be overloaded for type KeyT
     std::string to_str_generate(const key_type& key) const {
         std::ostringstream oss;
         oss << key;
