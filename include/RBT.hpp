@@ -35,12 +35,13 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         root_ptr->weight_ = 1;
         begin_ptr_ = root_ptr.get();
         root_ptr->parent_ = sentinel_ptr_;
+        root_ptr->color_ = Color::BLACK;
         sentinel_->left_ = std::move(root_ptr);
         return sentinel_->left_.get();
     }
 
   public:
-    pointer Tree_Insert(const key_type& key) {
+    pointer insert(const key_type& key) {
         pointer par = nullptr;
         pointer ins = sentinel_ptr_->left_.get();
 
@@ -79,6 +80,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
             par = par->parent_;
         }
 
+        RBT_insert_fixup(ins);
         return ins;
     }
 
@@ -133,6 +135,63 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
 
         node_down->weight_ = (node_down->left_ ? node_down->left_->weight_ : 0) +
                              (node_down->right_ ? node_down->right_->weight_ : 0) + 1;
+    }
+
+    void RBT_insert_fixup(pointer z) noexcept {
+        while (z->parent_->color_ == Color::RED) {
+            pointer parent = z->parent_;
+            pointer grand = parent->parent_;
+
+            bool is_parent_left = (parent == grand->left_.get());
+            pointer uncle = (is_parent_left ? grand->right_.get() : grand->left_.get());
+
+            if (uncle && uncle->color_ == Color::RED) {
+                uncle->color_ = Color::BLACK;
+                grand->color_ = Color::RED;
+                parent->color_ = Color::BLACK;
+                z = grand;
+                continue;
+            }
+
+            if (is_parent_left) {
+                if (z == parent->right_.get()) {
+                    LR(z);
+                } else {
+                    LL(z);
+                }
+            } else {
+                if (z == parent->left_.get()) {
+                    RL(z);
+                } else {
+                    RR(z);
+                }
+            }
+            break;
+        }
+
+        sentinel_ptr_->left_->color_ = Color::BLACK;
+    }
+
+    void LL(pointer z) noexcept {
+        right_rotate(z->parent_->parent_);
+        z->parent_->right_->color_ = Color::RED;
+        z->parent_->color_ = Color::BLACK;
+    }
+
+    void LR(pointer z) noexcept {
+        left_rotate(z->parent_);
+        LL(z->left_.get());
+    }
+
+    void RR(pointer z) noexcept {
+        left_rotate(z->parent_->parent_);
+        z->parent_->left_->color_ = Color::RED;
+        z->parent_->color_ = Color::BLACK;
+    }
+
+    void RL(pointer z) noexcept {
+        right_rotate(z->parent_);
+        RR(z->right_.get());
     }
 
     pointer find(const key_type& key) const {
