@@ -1,6 +1,7 @@
 #pragma once
 #include "Node.hpp"
 #include <functional>
+#include <iostream> //
 #include <memory>
 
 namespace details {
@@ -84,6 +85,23 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return ins;
     }
 
+    pointer find(const key_type& key) const {
+        pointer current = sentinel_ptr_->left_.get();
+
+        while (current) {
+            if (comp_(key, current->key_)) {
+                current = current->left_.get();
+            } else if (comp_(current->key_, key)) {
+                current = current->right_.get();
+            } else {
+                return current;
+            }
+        }
+
+        return sentinel_ptr_;
+    }
+
+  private:
     void left_rotate(pointer x_ptr) noexcept {
         pointer y_ptr = x_ptr->right_.get();
         if (!y_ptr)
@@ -194,20 +212,28 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         RR(z->right_.get());
     }
 
-    pointer find(const key_type& key) const {
-        pointer current = sentinel_ptr_->left_.get();
+  public:
+    template <bool Inclusive> std::size_t rank(const key_type& border) const noexcept {
+        pointer current = sentinel_->left_.get();
+        std::size_t amount = 0;
 
         while (current) {
-            if (comp_(key, current->key_)) {
-                current = current->left_.get();
-            } else if (comp_(current->key_, key)) {
+            bool is_suitable;
+
+            if constexpr (Inclusive) {
+                is_suitable = !comp_(border, current->key_);
+            } else {
+                is_suitable = comp_(current->key_, border);
+            }
+
+            if (is_suitable) {
+                amount += (current->left_ ? current->left_->weight_ : 0) + 1;
                 current = current->right_.get();
             } else {
-                return current;
+                current = current->left_.get();
             }
         }
-
-        return sentinel_ptr_;
+        return amount;
     }
 
 }; // <-- class Red_Black_Tree
