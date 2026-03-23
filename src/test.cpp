@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
         std::cout << val << " ";
     }
     std::cout << "\n";
-    std::cout << "rank 23: " << tree.rank<true>(23) << std::endl;
+    std::cout << "[3; 17] " << tree.count_inclusive_range(3, 17) << std::endl;
 
     try {
         details::Tree_builder<int> tree_builder(tree, argv[1]);

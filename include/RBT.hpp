@@ -1,10 +1,11 @@
 #pragma once
 #include "Node.hpp"
 #include <functional>
-#include <iostream> //
 #include <memory>
 
 namespace details {
+
+enum class BoundType { Inclusive, Exclusive };
 
 template <typename KeyT> class Tree_builder;
 
@@ -28,6 +29,15 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
   public:
     explicit Red_Black_Tree(const Comparator& comp = Comparator()) : comp_{comp} {
         sentinel_->color_ = Color::BLACK;
+    }
+
+    template <typename Iter>
+    Red_Black_Tree(Iter begin, Iter end, const Comparator& comp = Comparator())
+        : Red_Black_Tree(comp) {
+        while (begin != end) {
+            insert(*begin);
+            ++begin;
+        }
     }
 
   private:
@@ -212,18 +222,17 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         RR(z->right_.get());
     }
 
-  public:
-    template <bool Inclusive> std::size_t rank(const key_type& border) const noexcept {
+    template <BoundType Inclusivity> std::size_t rank(const key_type& bound) const noexcept {
         pointer current = sentinel_->left_.get();
         std::size_t amount = 0;
 
         while (current) {
             bool is_suitable;
 
-            if constexpr (Inclusive) {
-                is_suitable = !comp_(border, current->key_);
+            if constexpr (Inclusivity == BoundType::Inclusive) {
+                is_suitable = !comp_(bound, current->key_);
             } else {
-                is_suitable = comp_(current->key_, border);
+                is_suitable = comp_(current->key_, bound);
             }
 
             if (is_suitable) {
@@ -236,6 +245,43 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return amount;
     }
 
+  public:
+    std::size_t count_inclusive_range(const key_type& left_bnd,
+                                      const key_type& right_bnd) const noexcept {
+        if (!comp_(left_bnd, right_bnd))
+            return 0;
+        return (rank<BoundType::Inclusive>(right_bnd) - rank<BoundType::Exclusive>(left_bnd));
+    }
+
+    std::size_t count_exclusive_range(const key_type& left_bnd,
+                                      const key_type& right_bnd) const noexcept {
+        if (!comp_(left_bnd, right_bnd))
+            return 0;
+        return (rank<BoundType::Exclusive>(right_bnd) - rank<BoundType::Inclusive>(left_bnd));
+    }
+
+    std::size_t count_open_closed_range(const key_type& left_bnd,
+                                        const key_type& right_bnd) const noexcept {
+        if (!comp_(left_bnd, right_bnd))
+            return 0;
+        return (rank<BoundType::Inclusive>(right_bnd) - rank<BoundType::Inclusive>(left_bnd));
+    }
+
+    std::size_t count_closed_open_range(const key_type& left_bnd,
+                                        const key_type& right_bnd) const noexcept {
+        if (!comp_(left_bnd, right_bnd))
+            return 0;
+        return (rank<BoundType::Exclusive>(right_bnd) - rank<BoundType::Exclusive>(left_bnd));
+    }
+
 }; // <-- class Red_Black_Tree
+
+template <typename Iter, typename Comp>
+Red_Black_Tree(Iter begin, Iter end, const Comp& comp)
+    -> Red_Black_Tree<typename std::iterator_traits<Iter>::value_type, Comp>;
+
+template <typename Iter>
+Red_Black_Tree(Iter begin, Iter end)
+    -> Red_Black_Tree<typename std::iterator_traits<Iter>::value_type>;
 
 } // namespace details
