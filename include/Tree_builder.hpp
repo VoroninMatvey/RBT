@@ -2,6 +2,7 @@
 #include "Node.hpp"
 #include "RBT.hpp"
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -41,16 +42,36 @@ template <typename KeyT> class Tree_builder final {
         std::ofstream file =
             fs::path(RBT_dir_) / ("data/Tree_builder" + std::to_string(num) + ".dot");
 
-        file << "digraph RBT {\n\n\tnode [shape=" << node_shape << ", fontname=\"" << fontname
-             << "\"];\n\tedge [color=\"" << edge_color << "\", penwidth=" << penwidth << "];\n\n";
+        // clang-format off
+        file << std::format(R"DOT(
+        digraph RBT {{
+
+            node [shape={}, fontname="{}"];
+            edge [color="{}", penwidth={}];
+
+
+            )DOT", node_shape, fontname, edge_color, penwidth);
+        // clang-format on
 
         const_pointer root = RBT_.sentinel_->left_.get();
+        // clang-format off
         if (!root) {
-            file << "\t\"ROOT_NIL\" [shape = box, width = 1.0, height = 0.5, style = filled, "
-                 << "fillcolor = black, fontcolor = white, label = \"EMPTY TREE\\n(NIL)\", "
-                    "fontsize = 14];\n\n}";
+            file << R"DOT(
+                "ROOT_NIL" [
+                    shape = box, 
+                    width = 1.0, 
+                    height = 0.5, 
+                    style = filled, 
+                    fillcolor = black, 
+                    fontcolor = white, 
+                    label = "EMPTY TREE\n(NIL)", 
+                    fontsize = 14
+                ];
+            }
+            )DOT";
             return;
         }
+        // clang-format on
 
         recursive_traversal_dump(file, root, root->key_, NodeSide::left);
         file << "}";
@@ -71,36 +92,57 @@ template <typename KeyT> class Tree_builder final {
     }
 
     void dump_edge(std::ofstream& file, const_pointer node) const {
-        std::string left_edge_end = (node->left_ ? to_str_generate(node->left_->key_) + "\";\n"
-                                                 : to_str_generate(node->key_) + "_nilL\";\n");
+        std::string left_edge_end = (node->left_ ? to_str_generate(node->left_->key_)
+                                                 : to_str_generate(node->key_) + "_nilL");
 
-        std::string right_edge_end = (node->right_ ? to_str_generate(node->right_->key_) + "\";\n"
-                                                   : to_str_generate(node->key_) + "_nilR\";\n");
+        std::string right_edge_end = (node->right_ ? to_str_generate(node->right_->key_)
+                                                   : to_str_generate(node->key_) + "_nilR");
 
-        file << "\"" << node->key_ << "\" -> \"" << left_edge_end;
-        file << "\"" << node->key_ << "\" -> \"" << right_edge_end;
-        file << "\n";
+        // clang-format off
+        file << std::format(R"(
+            "{0}" -> "{1}";
+            "{0}" -> "{2}";   
+        )", to_str_generate(node->key_), left_edge_end, right_edge_end);
+        // clang-format on
+        file << std::endl;
     }
 
     void dump_real_node(std::ofstream& file, const_pointer node) const {
-        std::string bg_color = (node->color_ == Color::BLACK) ? "\"#333333\"" : "\"#ff4d4d\"";
-        std::string text_col = (node->color_ == Color::BLACK) ? "Black" : "Red";
+        std::string bg_color = (node->color_ == Color::BLACK) ? "#333333" : "#ff4d4d";
+        std::string text_color = (node->color_ == Color::BLACK) ? "Black" : "Red";
 
-        file << "\"" << node->key_
-             << "\" [label=<\n\t<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" "
-                "CELLPADDING=\"4\">\n\t<TR><TD>Key: "
-             << node->key_ << "</TD></TR>\n\t<TR><TD>Weight: " << node->weight_
-             << "</TD></TR>\n\t<TR><TD BGCOLOR=" << bg_color << "><FONT COLOR=\"white\">"
-             << text_col << "</FONT></TD></TR>\n\t</TABLE>\n>];\n\n";
+        // clang-format off
+        file << std::format(R"DOT(
+            "{0}" [label=<
+                <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+                    <TR><TD>Key: {0}</TD></TR>
+                    <TR><TD>Weight: {1}</TD></TR>
+                    <TR><TD BGCOLOR="{2}"><FONT COLOR="white">{3}</FONT></TD></TR>
+                </TABLE>
+            >];
+        )DOT", to_str_generate(node->key_), node->weight_, bg_color, text_color);
+        // clang-format on
+        file << std::endl;
     }
 
     void dump_nill_node(std::ofstream& file, const key_type& par_key, NodeSide side) const {
-        std::string beg = "\"" + to_str_generate(par_key) + "_nil";
-        beg += (side == NodeSide::left ? "L" : "R");
-        file << beg;
+        std::string suffix = (side == NodeSide::left ? "L" : "R");
+        std::string nil_id = to_str_generate(par_key) + "_nil" + suffix;
 
-        file << "\" [shape = box, width = 0.3, height = 0.2, style = filled, fillcolor = black, "
-                "fontcolor = white, label = \"NIL\", fontsize = 8];\n\n";
+        // clang-format off
+        file << std::format(R"DOT(
+            "{}" [ 
+                shape = box,
+                width = 0.3,
+                height = 0.2,
+                style = filled,
+                fillcolor = black,
+                fontcolor = white, 
+                label = "NIL",
+                fontsize = 8
+            ];
+        )DOT", nil_id);
+        // clang-format on
     }
 
     // operator << must be overloaded for type KeyT

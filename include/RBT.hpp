@@ -2,6 +2,7 @@
 #include "Node.hpp"
 #include <functional>
 #include <memory>
+#include <utility>
 
 namespace details {
 
@@ -117,18 +118,15 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         if (!y_ptr)
             return;
 
-        auto temp = std::move(x_ptr->right_);
-        x_ptr->right_ = std::move(y_ptr->left_);
+        auto y_node = std::exchange(x_ptr->right_, std::move(y_ptr->left_));
         if (x_ptr->right_)
             x_ptr->right_->parent_ = x_ptr;
 
         y_ptr->parent_ = x_ptr->parent_;
         if (x_ptr->parent_->left_.get() == x_ptr) {
-            y_ptr->left_ = std::move(x_ptr->parent_->left_);
-            y_ptr->parent_->left_ = std::move(temp);
+            y_ptr->left_ = std::exchange(x_ptr->parent_->left_, std::move(y_node));
         } else {
-            y_ptr->left_ = std::move(x_ptr->parent_->right_);
-            y_ptr->parent_->right_ = std::move(temp);
+            y_ptr->left_ = std::exchange(x_ptr->parent_->right_, std::move(y_node));
         }
         x_ptr->parent_ = y_ptr;
 
@@ -140,18 +138,15 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         if (!x_ptr)
             return;
 
-        auto temp = std::move(y_ptr->left_);
-        y_ptr->left_ = std::move(x_ptr->right_);
+        auto x_node = std::exchange(y_ptr->left_, std::move(x_ptr->right_));
         if (y_ptr->left_)
             y_ptr->left_->parent_ = y_ptr;
 
         x_ptr->parent_ = y_ptr->parent_;
         if (y_ptr->parent_->left_.get() == y_ptr) {
-            x_ptr->right_ = std::move(y_ptr->parent_->left_);
-            x_ptr->parent_->left_ = std::move(temp);
+            x_ptr->right_ = std::exchange(y_ptr->parent_->left_, std::move(x_node));
         } else {
-            x_ptr->right_ = std::move(y_ptr->parent_->right_);
-            x_ptr->parent_->right_ = std::move(temp);
+            x_ptr->right_ = std::exchange(y_ptr->parent_->right_, std::move(x_node));
         }
         y_ptr->parent_ = x_ptr;
 

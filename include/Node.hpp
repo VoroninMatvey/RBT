@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <utility>
 
 namespace details {
 
@@ -50,8 +51,7 @@ template <typename KeyT> struct Node final {
 
         pointer ptr2 = ptr1->parent_;
         while (ptr2->right_.get() == ptr1) {
-            ptr1 = ptr2;
-            ptr2 = ptr2->parent_;
+            ptr1 = std::exchange(ptr2, ptr2->parent_);
         }
         return ptr2;
     }
@@ -68,8 +68,7 @@ template <typename KeyT> struct Node final {
             return this; // if tree is empty
         pointer ptr2 = ptr1->parent_;
         while (ptr2->parent_ && ptr2->left_.get() == ptr1) {
-            ptr1 = ptr2;
-            ptr2 = ptr2->parent_;
+            ptr1 = std::exchange(ptr2, ptr2->parent_);
         }
         return ptr2;
     }

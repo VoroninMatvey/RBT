@@ -1,5 +1,6 @@
 #include "RBT.hpp"
 #include <iostream>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -7,7 +8,7 @@
 namespace {
 
 template <typename KeyT, typename Comparator = std::less<KeyT>>
-void requests_reading(std::vector<KeyT>& vec) {
+void requests_reading(std::vector<size_t>& vec) {
     details::Red_Black_Tree<KeyT, Comparator> tree{};
     char request;
 
@@ -36,17 +37,15 @@ void requests_reading(std::vector<KeyT>& vec) {
 }
 
 template <typename KeyT> void print_range_list(const std::vector<KeyT>& vec) {
-    for (auto&& element : vec) {
-        std::cout << element << " ";
-    }
+    std::copy(vec.begin(), vec.end(), std::ostream_iterator<KeyT>(std::cout, " "));
     std::cout << std::endl;
 }
 } // namespace
 
 int main() {
 
-    std::vector<int> range_list;
-    requests_reading(range_list);
+    std::vector<size_t> range_list;
+    requests_reading<int>(range_list);
     print_range_list(range_list);
 
     return 0;
