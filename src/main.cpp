@@ -8,7 +8,7 @@
 namespace {
 
 template <typename KeyT, typename Comparator = std::less<KeyT>>
-void requests_reading(std::vector<size_t>& vec) {
+void requests_reading(std::vector<size_t> &vec) {
     details::Red_Black_Tree<KeyT, Comparator> tree{};
     char request;
 
@@ -31,13 +31,15 @@ void requests_reading(std::vector<size_t>& vec) {
         }
 
         default:
-            throw std::runtime_error("Unknown request: " + std::string{request});
+            throw std::runtime_error("Unknown request: " +
+                                     std::string{request});
         }
     }
 }
 
-template <typename KeyT> void print_range_list(const std::vector<KeyT>& vec) {
-    std::copy(vec.begin(), vec.end(), std::ostream_iterator<KeyT>(std::cout, " "));
+template <typename KeyT> void print_range_list(const std::vector<KeyT> &vec) {
+    std::copy(vec.begin(), vec.end(),
+              std::ostream_iterator<KeyT>(std::cout, " "));
     std::cout << std::endl;
 }
 } // namespace

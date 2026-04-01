@@ -1,6 +1,8 @@
 #pragma once
 #include "Node.hpp"
+#include "Tree_iterator.hpp"
 #include <functional>
+#include <iterator>
 #include <memory>
 #include <utility>
 
@@ -16,10 +18,11 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
   public:
     using key_type = KeyT;
     using node_type = Node<key_type>;
-    using pointer = node_type*;
-    using const_pointer = const node_type*;
+    using pointer = node_type *;
+    using const_pointer = const node_type *;
     using unique_ptr = std::unique_ptr<node_type>;
     using const_unique_ptr = const std::unique_ptr<node_type>;
+    using iterator = Tree_iterator<key_type>;
 
   private:
     unique_ptr sentinel_ = std::make_unique<node_type>(key_type{});
@@ -28,12 +31,12 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
     [[no_unique_address]] Comparator comp_;
 
   public:
-    explicit Red_Black_Tree(const Comparator& comp = Comparator()) : comp_{comp} {
+    explicit Red_Black_Tree(const Comparator &comp = Comparator()) : comp_{comp} {
         sentinel_->color_ = Color::BLACK;
     }
 
     template <typename Iter>
-    Red_Black_Tree(Iter begin, Iter end, const Comparator& comp = Comparator())
+    Red_Black_Tree(Iter begin, Iter end, const Comparator &comp = Comparator())
         : Red_Black_Tree(comp) {
         while (begin != end) {
             insert(*begin);
@@ -42,7 +45,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
     }
 
   private:
-    pointer create_root_node(const key_type& key) {
+    pointer create_root_node(const key_type &key) {
         auto root_ptr = std::make_unique<node_type>(key);
         root_ptr->weight_ = 1;
         begin_ptr_ = root_ptr.get();
@@ -53,13 +56,13 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
     }
 
   public:
-    pointer insert(const key_type& key) {
+    iterator insert(const key_type &key) {
         pointer par = nullptr;
         pointer ins = sentinel_ptr_->left_.get();
 
         if (!ins) {
             ins = create_root_node(key);
-            return ins;
+            return begin();
         }
 
         while (ins) {
@@ -69,7 +72,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
             } else if (comp_(ins->key_, key)) {
                 ins = ins->right_.get();
             } else {
-                return par;
+                return iterator{par};
             }
         }
 
@@ -93,10 +96,10 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         }
 
         RBT_insert_fixup(ins);
-        return ins;
+        return iterator{ins};
     }
 
-    pointer find(const key_type& key) const {
+    iterator find(const key_type &key) const {
         pointer current = sentinel_ptr_->left_.get();
 
         while (current) {
@@ -105,11 +108,11 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
             } else if (comp_(current->key_, key)) {
                 current = current->right_.get();
             } else {
-                return current;
+                return iterator{current};
             }
         }
 
-        return sentinel_ptr_;
+        return end();
     }
 
   private:
@@ -217,7 +220,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         RR(z->right_.get());
     }
 
-    template <BoundType Inclusivity> std::size_t rank(const key_type& bound) const noexcept {
+    template <BoundType Inclusivity> std::size_t rank(const key_type &bound) const noexcept {
         pointer current = sentinel_->left_.get();
         std::size_t amount = 0;
 
@@ -241,29 +244,32 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
     }
 
   public:
-    std::size_t count_inclusive_range(const key_type& left_bnd,
-                                      const key_type& right_bnd) const noexcept {
+    iterator begin() const noexcept { return iterator{begin_ptr_}; }
+    iterator end() const noexcept { return iterator{sentinel_ptr_}; }
+
+    std::size_t count_inclusive_range(const key_type &left_bnd,
+                                      const key_type &right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
             return 0;
         return (rank<BoundType::Inclusive>(right_bnd) - rank<BoundType::Exclusive>(left_bnd));
     }
 
-    std::size_t count_exclusive_range(const key_type& left_bnd,
-                                      const key_type& right_bnd) const noexcept {
+    std::size_t count_exclusive_range(const key_type &left_bnd,
+                                      const key_type &right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
             return 0;
         return (rank<BoundType::Exclusive>(right_bnd) - rank<BoundType::Inclusive>(left_bnd));
     }
 
-    std::size_t count_open_closed_range(const key_type& left_bnd,
-                                        const key_type& right_bnd) const noexcept {
+    std::size_t count_open_closed_range(const key_type &left_bnd,
+                                        const key_type &right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
             return 0;
         return (rank<BoundType::Inclusive>(right_bnd) - rank<BoundType::Inclusive>(left_bnd));
     }
 
-    std::size_t count_closed_open_range(const key_type& left_bnd,
-                                        const key_type& right_bnd) const noexcept {
+    std::size_t count_closed_open_range(const key_type &left_bnd,
+                                        const key_type &right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
             return 0;
         return (rank<BoundType::Exclusive>(right_bnd) - rank<BoundType::Exclusive>(left_bnd));
@@ -272,11 +278,10 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
 }; // <-- class Red_Black_Tree
 
 template <typename Iter, typename Comp>
-Red_Black_Tree(Iter begin, Iter end, const Comp& comp)
-    -> Red_Black_Tree<typename std::iterator_traits<Iter>::value_type, Comp>;
+Red_Black_Tree(Iter begin, Iter end,
+               const Comp &comp) -> Red_Black_Tree<std::iter_value_t<Iter>, Comp>;
 
 template <typename Iter>
-Red_Black_Tree(Iter begin, Iter end)
-    -> Red_Black_Tree<typename std::iterator_traits<Iter>::value_type>;
+Red_Black_Tree(Iter begin, Iter end) -> Red_Black_Tree<std::iter_value_t<Iter>>;
 
 } // namespace details
