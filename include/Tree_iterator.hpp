@@ -1,8 +1,13 @@
+#pragma once
 #include "Node.hpp"
 
 namespace details {
 
+template <typename KeyT, typename Comparator> class Red_Black_Tree;
+
 template <typename KeyT> struct Tree_iterator final {
+
+    template <typename Key, typename Comparator> friend class Red_Black_Tree;
 
     using iterator_category = std::bidirectional_iterator_tag;
     using difference_type = std::ptrdiff_t;
@@ -18,9 +23,7 @@ template <typename KeyT> struct Tree_iterator final {
     Tree_iterator() noexcept : ptr_(nullptr) {}
 
     const_reference operator*() const noexcept { return ptr_->key_; }
-    const_pointer operator->() const noexcept {
-        return std::addressof(ptr_->key_);
-    }
+    const_pointer operator->() const noexcept { return std::addressof(ptr_->key_); }
 
     Tree_iterator &operator++() noexcept {
         ptr_ = ptr_->successor();
@@ -44,13 +47,11 @@ template <typename KeyT> struct Tree_iterator final {
         return old;
     }
 
-    friend bool operator==(const Tree_iterator &lhs,
-                           const Tree_iterator &rhs) noexcept {
+    friend bool operator==(const Tree_iterator &lhs, const Tree_iterator &rhs) noexcept {
         return lhs.ptr_ == rhs.ptr_;
     }
 
-    friend bool operator!=(const Tree_iterator &lhs,
-                           const Tree_iterator &rhs) noexcept {
+    friend bool operator!=(const Tree_iterator &lhs, const Tree_iterator &rhs) noexcept {
         return !(lhs == rhs);
     }
 

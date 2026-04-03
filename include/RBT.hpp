@@ -29,6 +29,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
     pointer sentinel_ptr_ = sentinel_.get();
     pointer begin_ptr_ = sentinel_.get();
     [[no_unique_address]] Comparator comp_;
+    std::size_t size_ = 0;
 
   public:
     explicit Red_Black_Tree(const Comparator &comp = Comparator()) : comp_{comp} {
@@ -52,6 +53,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         root_ptr->parent_ = sentinel_ptr_;
         root_ptr->color_ = Color::BLACK;
         sentinel_->left_ = std::move(root_ptr);
+        size_ = 1;
         return sentinel_->left_.get();
     }
 
@@ -89,6 +91,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
             ins->parent_ = par;
         }
 
+        size_ += 1;
         ins->weight_ = 1;
         while (par != sentinel_ptr_) {
             ++par->weight_;
@@ -220,6 +223,69 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         RR(z->right_.get());
     }
 
+  public:
+    iterator lower_bound(const key_type &key) const noexcept {
+        if (empty() || comp_(*(--end()), key)) {
+            return end();
+        }
+
+        pointer current = sentinel_->left_.get();
+        pointer answer = sentinel_ptr_;
+        while (current) {
+            if (comp_(key, current->key_)) {
+                answer = current;
+                current = current->left_.get();
+            } else if (comp_(current->key_, key)) {
+                current = current->right_.get();
+            } else {
+                return iterator{current};
+            }
+        }
+
+        return iterator{answer};
+    }
+
+    iterator upper_bound(const key_type &key) const noexcept {
+        if (empty() || !comp_(key, *(--end()))) {
+            return end();
+        }
+
+        pointer current = sentinel_->left_.get();
+        pointer answer = sentinel_ptr_;
+        while (current) {
+            if (comp_(key, current->key_)) {
+                answer = current;
+                current = current->left_.get();
+            } else {
+                current = current->right_.get();
+            }
+        }
+
+        return iterator{answer};
+    }
+
+    std::size_t rank(iterator iter) const noexcept { // strict less *iter
+        if (empty() || iter == begin())
+            return 0;
+
+        if (iter == end())
+            return size();
+
+        pointer prev = iter.ptr_;
+        pointer current = prev->parent_;
+
+        std::size_t sum = (prev->left_.get() ? prev->left_->weight_ : 0);
+        while (current != sentinel_ptr_) {
+            if (prev == current->right_.get())
+                sum += (current->left_.get() ? current->left_->weight_ : 0) + 1;
+
+            prev = current;
+            current = current->parent_;
+        }
+
+        return sum;
+    }
+
     template <BoundType Inclusivity> std::size_t rank(const key_type &bound) const noexcept {
         pointer current = sentinel_->left_.get();
         std::size_t amount = 0;
@@ -243,9 +309,11 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return amount;
     }
 
-  public:
     iterator begin() const noexcept { return iterator{begin_ptr_}; }
     iterator end() const noexcept { return iterator{sentinel_ptr_}; }
+    std::size_t size() const noexcept { return size_; }
+
+    bool empty() const noexcept { return size_ == 0; }
 
     std::size_t count_inclusive_range(const key_type &left_bnd,
                                       const key_type &right_bnd) const noexcept {
