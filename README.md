@@ -1,6 +1,6 @@
 # Implementation of the range query algorithm in a binary search tree
 ## Information about project:
-In this project range query was implemented using the method of ordinal statistics. «This allows us to find the count of elements in a range in logarithmic rather than linear time.
+In this project range query was implemented using the method of ordinal statistics. This allows us to find the count of elements in a range in logarithmic rather than linear time.
 ## Building the project:
 ```
 git clone git@github.com:VoroninMatvey/RBT.git
@@ -24,4 +24,7 @@ There min_value and max_value - minimum and maximum key value.
 In directory data/tests are generated tests and answers.
 ## Running tests
 ```
-bash scripts/run_generated_tests.sh 
+bash scripts/run_generated_tests.sh
+
+<img width="2379" height="1144" alt="1" src="https://github.com/user-attachments/assets/1c3fd54b-0ca0-46df-9218-44be0022d141" />
+
