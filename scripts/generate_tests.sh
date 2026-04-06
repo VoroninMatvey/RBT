@@ -14,4 +14,4 @@ KEYS_NUM=$2;
 MIN_VAL=$3;
 MAX_VAL=$4;
 
-echo -e "${TESTS_NUM}\n${KEYS_NUM}\n{MIN_VAL}\n{MAX_VAL}" | "${GEN_DIR}/generator" "${PROJECT_ROOT}"
+echo -e "${TESTS_NUM}\n${KEYS_NUM}\n${MIN_VAL}\n${MAX_VAL}" | "${GEN_DIR}/generator" "${PROJECT_ROOT}"
