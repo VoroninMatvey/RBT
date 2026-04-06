@@ -25,9 +25,13 @@ template <std::integral T> class generator final {
     const value_type max_;
 
   public:
-    generator(const std::string& str, const size_t tests_num, const size_t key_num,
+    generator(const std::string &str, const size_t tests_num, const size_t key_num,
               value_type min = -50000, value_type max = 50000)
         : RBT_dir_(str), tests_num_(tests_num), key_num_(key_num), min_(min), max_(max) {
+        if (min > max) {
+            throw std::invalid_argument("min value is greater than max value");
+        }
+
         if (key_num_ > max_ - min_ + 1)
             throw std::invalid_argument(
                 "There are not enough values ​​in the range for this number of keys");
@@ -47,7 +51,7 @@ template <std::integral T> class generator final {
     }
 
   private:
-    void single_test_generation(std::ofstream& test_file, std::ofstream& answ_file) {
+    void single_test_generation(std::ofstream &test_file, std::ofstream &answ_file) {
         std::set<value_type> set;
 
         while (set.size() < key_num_) {
@@ -79,7 +83,7 @@ template <std::integral T> class generator final {
         return dist(gen_);
     }
 
-    value_type unique_key(const std::set<value_type>& set) {
+    value_type unique_key(const std::set<value_type> &set) {
         if (set.empty())
             return random(min_, max_);
 
@@ -91,7 +95,7 @@ template <std::integral T> class generator final {
         return key;
     }
 
-    size_t range_query(const std::set<value_type>& tree, value_type fst, value_type snd) {
+    size_t range_query(const std::set<value_type> &tree, value_type fst, value_type snd) {
         auto start = tree.lower_bound(fst);
         auto fin = tree.upper_bound(snd);
         return std::distance(start, fin);
