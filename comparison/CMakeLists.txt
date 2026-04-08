@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.11)
-project("generator")
+project("comparison")
 set(CMAKE_CXX_STANDARD 20)
 
-set(SRCS src/generator.cpp)
+set(SRCS src/comparison.cpp)
 add_executable(${PROJECT_NAME} ${SRCS})
 target_include_directories(${PROJECT_NAME} PUBLIC 
-    "include" 
-    "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+    "include" "../include"
 )

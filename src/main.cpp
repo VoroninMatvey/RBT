@@ -26,7 +26,7 @@ void requests_reading(std::vector<size_t> &vec) {
         case 'q': {
             KeyT left_bnd, right_bnd;
             std::cin >> left_bnd >> right_bnd;
-            std::size_t range = details::my_range_query(tree, left_bnd, right_bnd);
+            std::size_t range = details::range_query(tree, left_bnd, right_bnd);
             vec.push_back(range);
             break;
         }

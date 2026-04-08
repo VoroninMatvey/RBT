@@ -1,4 +1,4 @@
-#include "../include/generator.hpp"
+#include "generator.hpp"
 #include <iostream>
 #include <string>
 

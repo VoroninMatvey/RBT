@@ -8,3 +8,4 @@ add_executable(${PROJECT_NAME} ${SRCS})
 target_include_directories(${PROJECT_NAME} PUBLIC "include")
 
 add_subdirectory(tests)
+add_subdirectory(comparison)
