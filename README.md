@@ -26,5 +26,12 @@ In directory data/tests are generated tests and answers.
 ```
 bash scripts/run_generated_tests.sh
 ```
+## Running comparison
+```
+./build/comparison/comparison
+```
+The results of my comparison are presented in the file comparison_results.txt
+
+
 <img width="2379" height="1144" alt="1" src="https://github.com/user-attachments/assets/1c3fd54b-0ca0-46df-9218-44be0022d141" />
 

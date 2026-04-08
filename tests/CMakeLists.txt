@@ -4,7 +4,4 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(SRCS src/generator.cpp)
 add_executable(${PROJECT_NAME} ${SRCS})
-target_include_directories(${PROJECT_NAME} PUBLIC 
-    "include" 
-    "${CMAKE_CURRENT_SOURCE_DIR}/../include"
-)
+target_include_directories(${PROJECT_NAME} PUBLIC "include")

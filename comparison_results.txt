@@ -1,0 +1,30 @@
+Time measurements are taken for the range_query method over a tree consisting of sequential elements from 0 to 1000000
+
+For range [499990, 500010]:
+average time for std::set range query: 1.249 ns
+average time for RBT range query:      5.783 ns
+    
+For range [499900, 500100]:
+average time for std::set range query: 2.753 ns
+average time for RBT range query:      4.001 ns
+    
+For range [499000, 501000]:
+average time for std::set range query: 23.606 ns
+average time for RBT range query:      2.218 ns
+    
+For range [490000, 510000]:
+average time for std::set range query: 819.935 ns
+average time for RBT range query:      2.014 ns
+    
+For range [400000, 600000]:
+average time for std::set range query: 18549.092 ns
+average time for RBT range query:      2.269 ns
+    
+For range [200000, 800000]:
+average time for std::set range query: 54791.503 ns
+average time for RBT range query:      2.443 ns
+    
+For range [0, 1000000]:
+average time for std::set range query: 93284.453 ns
+average time for RBT range query:      1.293 ns
+    
