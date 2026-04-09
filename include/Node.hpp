@@ -8,7 +8,7 @@ enum class Color { RED, BLACK };
 
 template <typename KeyT> struct Node final {
 
-    using pointer = Node *;
+    using pointer = Node*;
     using unique_ptr = std::unique_ptr<Node>;
 
     const KeyT key_;
@@ -17,9 +17,9 @@ template <typename KeyT> struct Node final {
     std::size_t weight_ = 0;
     Color color_ = Color::RED;
 
-    explicit Node(const KeyT &key) : key_{key} {}
+    explicit Node(const KeyT& key) : key_{key} {}
 
-    static pointer minimum(pointer val) noexcept {
+    static pointer left_most(pointer val) noexcept {
         if (!val)
             return val;
 
@@ -29,7 +29,7 @@ template <typename KeyT> struct Node final {
         return val;
     }
 
-    static pointer maximum(pointer val) noexcept {
+    static pointer right_most(pointer val) noexcept {
         if (!val)
             return val;
 
@@ -46,7 +46,7 @@ template <typename KeyT> struct Node final {
             return this; // if *this == end_node
         pointer ptr1 = this;
         if (ptr1->right_) {
-            return minimum(ptr1->right_.get());
+            return left_most(ptr1->right_.get());
         }
 
         pointer ptr2 = ptr1->parent_;
@@ -61,7 +61,7 @@ template <typename KeyT> struct Node final {
     pointer predecessor() noexcept {
         pointer ptr1 = this;
         if (ptr1->left_) {
-            return maximum(ptr1->left_.get());
+            return right_most(ptr1->left_.get());
         }
 
         if (!parent_)

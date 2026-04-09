@@ -38,7 +38,8 @@ template <typename KeyT> class Benchmarker final {
     size_t rep_count_;
     std::vector<comp_results<KeyT>> log_;
 
-    template <typename TreeType> void warmup(const TreeType &tree, KeyT dev) const {
+    // Warms up the cache before the control time measurement
+    template <typename TreeType> void warmup(const TreeType& tree, KeyT dev) const {
         KeyT fst = mid_range_ - dev;
         KeyT snd = mid_range_ + dev;
         for (size_t i = 0; i < warmups_; ++i) {
@@ -46,8 +47,9 @@ template <typename KeyT> class Benchmarker final {
         }
     }
 
+    // Measures the average time for a particular tree for a particular range
     template <typename TreeType>
-    double measure_performance(const TreeType &tree, const KeyT dev) const {
+    double measure_performance(const TreeType& tree, const KeyT dev) const {
         warmup(tree, dev);
         KeyT fst = mid_range_ - dev;
         KeyT snd = mid_range_ + dev;
@@ -61,33 +63,42 @@ template <typename KeyT> class Benchmarker final {
         return total_time.count() / rep_count_;
     }
 
-    // first - std::set, second - my tree
+    // Measures the average time for two trees .First - std::set, second - my tree
     template <typename TreeType1, typename TreeType2>
-    std::pair<double, double> pair_measure_performance(const TreeType1 &tree1,
-                                                       const TreeType2 &tree2, KeyT dev) const {
+    std::pair<double, double> pair_measure_performance(const TreeType1& tree1,
+                                                       const TreeType2& tree2, KeyT dev) const {
         double avg_set_time = measure_performance<TreeType1>(tree1, dev);
         double avg_RBT_time = measure_performance<TreeType2>(tree2, dev);
         return {avg_set_time, avg_RBT_time};
     }
 
   public:
-    Benchmarker(const std::vector<KeyT> &mid_dev, const KeyT &mid, const size_t warmups = 100,
+    // Fills the resulting std::vector with the measurement results
+    Benchmarker(const std::vector<KeyT>& mid_dev, const KeyT& mid, const size_t warmups = 100,
                 const size_t rep_count = 300)
         : middle_dev_(mid_dev), mid_range_(mid), warmups_(warmups), rep_count_(rep_count) {}
 
     template <typename TreeType1, typename TreeType2>
-    void run_benchmark(const TreeType1 &set, const TreeType2 &RBT) {
-        for (auto &&elem : middle_dev_) {
+    void run_benchmark(const TreeType1& set, const TreeType2& RBT) {
+        for (auto&& elem : middle_dev_) {
             auto pair = pair_measure_performance(set, RBT, elem);
             log_.emplace_back(elem, pair.first, pair.second, mid_range_);
         }
     }
 
-    auto begin() const noexcept { return log_.begin(); }
-    auto end() const noexcept { return log_.end(); }
+    auto begin() const noexcept {
+        return log_.begin();
+    }
+    auto end() const noexcept {
+        return log_.end();
+    }
 
-    auto cbegin() const noexcept { return log_.cbegin(); }
-    auto cend() const noexcept { return log_.cend(); }
+    auto cbegin() const noexcept {
+        return log_.cbegin();
+    }
+    auto cend() const noexcept {
+        return log_.cend();
+    }
 
 }; // <-- class efficiency_comparison
 

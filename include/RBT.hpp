@@ -18,8 +18,8 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
   public:
     using key_type = KeyT;
     using node_type = Node<key_type>;
-    using pointer = node_type *;
-    using const_pointer = const node_type *;
+    using pointer = node_type*;
+    using const_pointer = const node_type*;
     using unique_ptr = std::unique_ptr<node_type>;
     using const_unique_ptr = const std::unique_ptr<node_type>;
     using iterator = Tree_iterator<key_type>;
@@ -32,12 +32,12 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
     std::size_t size_ = 0;
 
   public:
-    explicit Red_Black_Tree(const Comparator &comp = Comparator()) : comp_{comp} {
+    explicit Red_Black_Tree(const Comparator& comp = Comparator()) : comp_{comp} {
         sentinel_->color_ = Color::BLACK;
     }
 
     template <typename Iter>
-    Red_Black_Tree(Iter begin, Iter end, const Comparator &comp = Comparator())
+    Red_Black_Tree(Iter begin, Iter end, const Comparator& comp = Comparator())
         : Red_Black_Tree(comp) {
         while (begin != end) {
             insert(*begin);
@@ -46,7 +46,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
     }
 
   private:
-    pointer create_root_node(const key_type &key) {
+    pointer create_root_node(const key_type& key) {
         auto root_ptr = std::make_unique<node_type>(key);
         root_ptr->weight_ = 1;
         begin_ptr_ = root_ptr.get();
@@ -58,7 +58,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
     }
 
   public:
-    iterator insert(const key_type &key) {
+    iterator insert(const key_type& key) {
         pointer par = nullptr;
         pointer ins = sentinel_ptr_->left_.get();
 
@@ -102,7 +102,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return iterator{ins};
     }
 
-    iterator find(const key_type &key) const {
+    iterator find(const key_type& key) const {
         pointer current = sentinel_ptr_->left_.get();
 
         while (current) {
@@ -166,6 +166,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
                              (node_down->right_ ? node_down->right_->weight_ : 0) + 1;
     }
 
+    // Restores the properties of a red-black tree after inserting a new node.
     void RBT_insert_fixup(pointer z) noexcept {
         while (z->parent_->color_ == Color::RED) {
             pointer parent = z->parent_;
@@ -201,6 +202,9 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         sentinel_ptr_->left_->color_ = Color::BLACK;
     }
 
+    // The following 4 methods restore the properties of a red-black tree and are used in
+    // RBT_insert_fixup. The name of the method characterizes the location of the inserted node
+    // relative to its grandfather. LR: parent is left child, inserted node is right
     void LL(pointer z) noexcept {
         right_rotate(z->parent_->parent_);
         z->parent_->right_->color_ = Color::RED;
@@ -224,7 +228,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
     }
 
   public:
-    iterator lower_bound(const key_type &key) const noexcept {
+    iterator lower_bound(const key_type& key) const noexcept {
         if (empty() || comp_(*(--end()), key)) {
             return end();
         }
@@ -245,7 +249,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return iterator{answer};
     }
 
-    iterator upper_bound(const key_type &key) const noexcept {
+    iterator upper_bound(const key_type& key) const noexcept {
         if (empty() || !comp_(key, *(--end()))) {
             return end();
         }
@@ -264,7 +268,8 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return iterator{answer};
     }
 
-    std::size_t rank(iterator iter) const noexcept { // strict less *iter
+    // Returns the number of elements in the tree strictly less than *iter
+    std::size_t rank(iterator iter) const noexcept {
         if (empty() || iter == begin())
             return 0;
 
@@ -286,7 +291,9 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return sum;
     }
 
-    template <BoundType Inclusivity> std::size_t rank(const key_type &bound) const noexcept {
+    // Returns the number of elements in the tree less(Exclusive) /less or equal(Inclusive) tnah
+    // bound
+    template <BoundType Inclusivity> std::size_t rank(const key_type& bound) const noexcept {
         pointer current = sentinel_->left_.get();
         std::size_t amount = 0;
 
@@ -309,35 +316,47 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return amount;
     }
 
-    iterator begin() const noexcept { return iterator{begin_ptr_}; }
-    iterator end() const noexcept { return iterator{sentinel_ptr_}; }
-    std::size_t size() const noexcept { return size_; }
+    iterator begin() const noexcept {
+        return iterator{begin_ptr_};
+    }
+    iterator end() const noexcept {
+        return iterator{sentinel_ptr_};
+    }
+    std::size_t size() const noexcept {
+        return size_;
+    }
 
-    bool empty() const noexcept { return size_ == 0; }
+    bool empty() const noexcept {
+        return size_ == 0;
+    }
 
-    std::size_t count_inclusive_range(const key_type &left_bnd,
-                                      const key_type &right_bnd) const noexcept {
+    //[left_bnd, right_bnd]
+    std::size_t count_inclusive_range(const key_type& left_bnd,
+                                      const key_type& right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
             return 0;
         return (rank<BoundType::Inclusive>(right_bnd) - rank<BoundType::Exclusive>(left_bnd));
     }
 
-    std::size_t count_exclusive_range(const key_type &left_bnd,
-                                      const key_type &right_bnd) const noexcept {
+    //(left_bnd, right_bnd)
+    std::size_t count_exclusive_range(const key_type& left_bnd,
+                                      const key_type& right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
             return 0;
         return (rank<BoundType::Exclusive>(right_bnd) - rank<BoundType::Inclusive>(left_bnd));
     }
 
-    std::size_t count_open_closed_range(const key_type &left_bnd,
-                                        const key_type &right_bnd) const noexcept {
+    //(left_bnd, right_bnd]
+    std::size_t count_open_closed_range(const key_type& left_bnd,
+                                        const key_type& right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
             return 0;
         return (rank<BoundType::Inclusive>(right_bnd) - rank<BoundType::Inclusive>(left_bnd));
     }
 
-    std::size_t count_closed_open_range(const key_type &left_bnd,
-                                        const key_type &right_bnd) const noexcept {
+    //[left_bnd, right_bnd)
+    std::size_t count_closed_open_range(const key_type& left_bnd,
+                                        const key_type& right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
             return 0;
         return (rank<BoundType::Exclusive>(right_bnd) - rank<BoundType::Exclusive>(left_bnd));
@@ -347,7 +366,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
 
 template <typename Iter, typename Comp>
 Red_Black_Tree(Iter begin, Iter end,
-               const Comp &comp) -> Red_Black_Tree<std::iter_value_t<Iter>, Comp>;
+               const Comp& comp) -> Red_Black_Tree<std::iter_value_t<Iter>, Comp>;
 
 template <typename Iter>
 Red_Black_Tree(Iter begin, Iter end) -> Red_Black_Tree<std::iter_value_t<Iter>>;
