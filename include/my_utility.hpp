@@ -7,7 +7,7 @@ namespace Labs {
 
 namespace details {
 
-template <typename C, typename It> std::size_t my_distance(const C &tree, It start, It fin) {
+template <typename C, typename It> std::size_t my_distance(const C& tree, It start, It fin) {
     std::size_t num_start = tree.rank(start);
     std::size_t num_fin = tree.rank(fin);
     return (num_fin > num_start ? (num_fin - num_start) : 0);
@@ -15,8 +15,7 @@ template <typename C, typename It> std::size_t my_distance(const C &tree, It sta
 
 } // namespace details
 
-// Returns the number of elements in the range [fst, snd]
-template <typename T, typename C> std::size_t range_query(const C &tree, T fst, T snd) {
+template <typename T, typename C> std::size_t range_query(const C& tree, T fst, T snd) {
     auto start = tree.lower_bound(fst);
     auto fin = tree.upper_bound(snd);
 

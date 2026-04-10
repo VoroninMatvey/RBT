@@ -10,7 +10,6 @@
 
 namespace {
 
-// Shuffles the numbers in a std::vector in random order
 template <typename T> void create_shuffle_range(std::vector<T>& vec) {
     std::iota(vec.begin(), vec.end(), T{});
 
@@ -20,11 +19,7 @@ template <typename T> void create_shuffle_range(std::vector<T>& vec) {
 }
 
 template <typename T>
-<<<<<<< HEAD
-void print_results(const details::Benchmarker<T>& obj, std::ostream& os = std::cout) {
-=======
-void print_results(const Labs::Benchmarker<T> &obj, std::ostream &os = std::cout) {
->>>>>>> 771dedc (add nmespace Labs)
+void print_results(const Labs::Benchmarker<T>& obj, std::ostream& os = std::cout) {
     os << "Time measurements are taken for the range_query method over a tree consisting of "
           "sequential elements from 0 to 1000000"
        << std::endl
