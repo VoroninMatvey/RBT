@@ -1,7 +1,9 @@
 #pragma once
 #include "Node.hpp"
+#include <cstddef>
+#include <iterator>
 
-namespace details {
+namespace Labs {
 
 template <typename KeyT, typename Comparator> class Red_Black_Tree;
 
@@ -16,7 +18,7 @@ template <typename KeyT> struct Tree_iterator final {
     using const_pointer = pointer;
     using reference = const value_type &;
     using const_reference = reference;
-    using node_type = Node<value_type>;
+    using node_type = details::Node<value_type>;
     using node_pointer = node_type *;
 
     explicit Tree_iterator(node_pointer ptr) noexcept : ptr_(ptr) {}
@@ -60,4 +62,4 @@ template <typename KeyT> struct Tree_iterator final {
 
 }; // <-- struct Tree_iterator
 
-} // namespace details
+} // namespace Labs

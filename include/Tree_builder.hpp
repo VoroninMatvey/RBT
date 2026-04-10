@@ -7,26 +7,25 @@
 #include <sstream>
 #include <string>
 
-namespace details {
+namespace Labs {
 
 namespace fs = std::filesystem;
 
-enum class NodeSide { left, right };
-
 template <typename KeyT> class Tree_builder final {
+    enum class NodeSide { left, right };
 
   public:
     using key_type = KeyT;
-    using node_type = Node<key_type>;
-    using pointer = node_type*;
-    using const_pointer = const node_type*;
+    using node_type = details::Node<key_type>;
+    using pointer = node_type *;
+    using const_pointer = const node_type *;
 
   private:
-    const Red_Black_Tree<KeyT>& RBT_;
+    const Red_Black_Tree<KeyT> &RBT_;
     const std::string RBT_dir_;
 
   public:
-    Tree_builder(const Red_Black_Tree<key_type>& RBT, const std::string& tree_dir)
+    Tree_builder(const Red_Black_Tree<key_type> &RBT, const std::string &tree_dir)
         : RBT_{RBT}, RBT_dir_{tree_dir} {}
 
     void create_directory() const {
@@ -34,8 +33,8 @@ template <typename KeyT> class Tree_builder final {
         fs::create_directories(dir);
     }
 
-    void dump_tree(std::size_t num, const std::string& node_shape = "none",
-                   const std::string& fontname = "Arial", const std::string& edge_color = "#555555",
+    void dump_tree(std::size_t num, const std::string &node_shape = "none",
+                   const std::string &fontname = "Arial", const std::string &edge_color = "#555555",
                    const double penwidth = 1.5) const {
 
         create_directory();
@@ -77,21 +76,21 @@ template <typename KeyT> class Tree_builder final {
         file << "}";
     }
 
-    void recursive_traversal_dump(std::ofstream& file, const_pointer node, const key_type& par_key,
+    void recursive_traversal_dump(std::ofstream &file, const_pointer node, const key_type &par_key,
                                   NodeSide side) const {
         if (!node) {
             dump_nill_node(file, par_key, side);
             return;
         }
 
-        const key_type& key = node->key_;
+        const key_type &key = node->key_;
         dump_real_node(file, node);
         dump_edge(file, node);
         recursive_traversal_dump(file, node->left_.get(), key, NodeSide::left);
         recursive_traversal_dump(file, node->right_.get(), key, NodeSide::right);
     }
 
-    void dump_edge(std::ofstream& file, const_pointer node) const {
+    void dump_edge(std::ofstream &file, const_pointer node) const {
         std::string left_edge_end = (node->left_ ? to_str_generate(node->left_->key_)
                                                  : to_str_generate(node->key_) + "_nilL");
 
@@ -107,9 +106,9 @@ template <typename KeyT> class Tree_builder final {
         file << std::endl;
     }
 
-    void dump_real_node(std::ofstream& file, const_pointer node) const {
-        std::string bg_color = (node->color_ == Color::BLACK) ? "#333333" : "#ff4d4d";
-        std::string text_color = (node->color_ == Color::BLACK) ? "Black" : "Red";
+    void dump_real_node(std::ofstream &file, const_pointer node) const {
+        std::string bg_color = (node->color_ == details::Color::BLACK) ? "#333333" : "#ff4d4d";
+        std::string text_color = (node->color_ == details::Color::BLACK) ? "Black" : "Red";
 
         // clang-format off
         file << std::format(R"DOT(
@@ -125,7 +124,7 @@ template <typename KeyT> class Tree_builder final {
         file << std::endl;
     }
 
-    void dump_nill_node(std::ofstream& file, const key_type& par_key, NodeSide side) const {
+    void dump_nill_node(std::ofstream &file, const key_type &par_key, NodeSide side) const {
         std::string suffix = (side == NodeSide::left ? "L" : "R");
         std::string nil_id = to_str_generate(par_key) + "_nil" + suffix;
 
@@ -146,7 +145,7 @@ template <typename KeyT> class Tree_builder final {
     }
 
     // operator << must be overloaded for type KeyT
-    std::string to_str_generate(const key_type& key) const {
+    std::string to_str_generate(const key_type &key) const {
         std::ostringstream oss;
         oss << key;
         return oss.str();
@@ -154,4 +153,4 @@ template <typename KeyT> class Tree_builder final {
 
 }; // <-- class Tree_builder
 
-} // namespace details
+} // namespace Labs

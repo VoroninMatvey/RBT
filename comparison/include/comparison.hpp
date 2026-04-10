@@ -1,3 +1,4 @@
+#pragma once
 #include "my_utility.hpp"
 #include <chrono>
 #include <format>
@@ -5,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-namespace details {
+namespace Labs {
 
 using size_t = std::size_t;
 
@@ -17,7 +18,7 @@ template <typename KeyT> struct comp_results final {
 
     comp_results(KeyT dev, double set_time, double RBT_time, KeyT mid) noexcept
         : dev_(dev), set_time_(set_time), RBT_time_(RBT_time), mid_range_(mid) {}
-};
+}; // namespace template<typenameKeyT>structcomp_results final
 
 // clang-format off
 template <typename KeyT> std::ostream &operator<<(std::ostream &os, const comp_results<KeyT> &obj) {
@@ -102,4 +103,4 @@ template <typename KeyT> class Benchmarker final {
 
 }; // <-- class efficiency_comparison
 
-}; // namespace details
+}; // namespace Labs

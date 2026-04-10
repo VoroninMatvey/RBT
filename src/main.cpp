@@ -10,7 +10,7 @@ namespace {
 
 template <typename KeyT, typename Comparator = std::less<KeyT>>
 void requests_reading(std::vector<size_t> &vec) {
-    details::Red_Black_Tree<KeyT, Comparator> tree{};
+    Labs::Red_Black_Tree<KeyT, Comparator> tree{};
     char request;
 
     while (std::cin >> request) {
@@ -26,7 +26,7 @@ void requests_reading(std::vector<size_t> &vec) {
         case 'q': {
             KeyT left_bnd, right_bnd;
             std::cin >> left_bnd >> right_bnd;
-            std::size_t range = details::range_query(tree, left_bnd, right_bnd);
+            std::size_t range = Labs::range_query(tree, left_bnd, right_bnd);
             vec.push_back(range);
             break;
         }

@@ -2,6 +2,8 @@
 #include <memory>
 #include <utility>
 
+namespace Labs {
+
 namespace details {
 
 enum class Color { RED, BLACK };
@@ -75,3 +77,5 @@ template <typename KeyT> struct Node final {
 }; // <-- struct Node
 
 } // namespace details
+
+} // namespace Labs

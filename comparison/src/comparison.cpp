@@ -20,12 +20,16 @@ template <typename T> void create_shuffle_range(std::vector<T>& vec) {
 }
 
 template <typename T>
+<<<<<<< HEAD
 void print_results(const details::Benchmarker<T>& obj, std::ostream& os = std::cout) {
+=======
+void print_results(const Labs::Benchmarker<T> &obj, std::ostream &os = std::cout) {
+>>>>>>> 771dedc (add nmespace Labs)
     os << "Time measurements are taken for the range_query method over a tree consisting of "
           "sequential elements from 0 to 1000000"
        << std::endl
        << std::endl;
-    std::copy(obj.begin(), obj.end(), std::ostream_iterator<details::comp_results<T>>(os, "\n"));
+    std::copy(obj.begin(), obj.end(), std::ostream_iterator<Labs::comp_results<T>>(os, "\n"));
 }
 } // namespace
 
@@ -34,10 +38,10 @@ int main() {
     std::vector<std::size_t> vec(size);
     create_shuffle_range(vec);
     std::set set(vec.begin(), vec.end());
-    details::Red_Black_Tree my_tree(vec.begin(), vec.end());
+    Labs::Red_Black_Tree my_tree(vec.begin(), vec.end());
 
     std::vector<std::size_t> dev = {10, 100, 1000, 10000, 100000, 300000, 500000};
-    details::Benchmarker<std::size_t> benchmark(dev, size / 2);
+    Labs::Benchmarker<std::size_t> benchmark(dev, size / 2);
     benchmark.run_benchmark(set, my_tree);
     print_results(benchmark);
 }
