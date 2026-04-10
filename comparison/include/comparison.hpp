@@ -18,7 +18,7 @@ template <typename KeyT> struct comp_results final {
 
     comp_results(KeyT dev, double set_time, double RBT_time, KeyT mid) noexcept
         : dev_(dev), set_time_(set_time), RBT_time_(RBT_time), mid_range_(mid) {}
-}; // namespace template<typenameKeyT>structcomp_results final
+}; // struct comp_results
 
 // clang-format off
 template <typename KeyT> std::ostream &operator<<(std::ostream &os, const comp_results<KeyT> &obj) {
