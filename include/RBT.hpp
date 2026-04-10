@@ -170,6 +170,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
                              (node_down->right_ ? node_down->right_->weight_ : 0) + 1;
     }
 
+    // Restores the properties of a red-black tree after inserting a new node.
     void RBT_insert_fixup(pointer z) noexcept {
         while (z->parent_->color_ == details::Color::RED) {
             pointer parent = z->parent_;
@@ -205,6 +206,9 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         sentinel_ptr_->left_->color_ = details::Color::BLACK;
     }
 
+    // The following 4 methods restore the properties of a red-black tree and are used in
+    // RBT_insert_fixup. The name of the method characterizes the location of the inserted node
+    // relative to its grandfather. LR: parent is left child, inserted node is right
     void LL(pointer z) noexcept {
         right_rotate(z->parent_->parent_);
         z->parent_->right_->color_ = details::Color::RED;
@@ -268,7 +272,8 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return iterator{answer};
     }
 
-    std::size_t rank(iterator iter) const noexcept { // strict less *iter
+    // Returns the number of elements in the tree strictly less than *iter
+    std::size_t rank(iterator iter) const noexcept {
         if (empty() || iter == begin())
             return 0;
 
@@ -290,6 +295,8 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return sum;
     }
 
+    // Returns the number of elements in the tree less(Exclusive) /less or equal(Inclusive) tnah
+    // bound
     template <details::BoundType Inclusivity>
     std::size_t rank(const key_type& bound) const noexcept {
         pointer current = sentinel_->left_.get();
@@ -328,6 +335,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
         return size_ == 0;
     }
 
+    //[left_bnd, right_bnd]
     std::size_t count_inclusive_range(const key_type& left_bnd,
                                       const key_type& right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
@@ -336,6 +344,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
                 rank<details::BoundType::Exclusive>(left_bnd));
     }
 
+    //(left_bnd, right_bnd)
     std::size_t count_exclusive_range(const key_type& left_bnd,
                                       const key_type& right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
@@ -344,6 +353,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
                 rank<details::BoundType::Inclusive>(left_bnd));
     }
 
+    //(left_bnd, right_bnd]
     std::size_t count_open_closed_range(const key_type& left_bnd,
                                         const key_type& right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
@@ -352,6 +362,7 @@ template <typename KeyT, typename Comparator = std::less<KeyT>> class Red_Black_
                 rank<details::BoundType::Inclusive>(left_bnd));
     }
 
+    //[left_bnd, right_bnd)
     std::size_t count_closed_open_range(const key_type& left_bnd,
                                         const key_type& right_bnd) const noexcept {
         if (!comp_(left_bnd, right_bnd))
